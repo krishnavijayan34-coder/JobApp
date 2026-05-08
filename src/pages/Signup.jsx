@@ -4,66 +4,171 @@ import { Box, Typography, TextField, Button, Paper,
          ToggleButton, ToggleButtonGroup } from '@mui/material';
 
 function Signup() {
-  const [role,     setRole]     = useState('seeker');
-  const [name,     setName]     = useState('');
-  const [email,    setEmail]    = useState('');
-  const [password, setPassword] = useState('');
-  const [confirm,  setConfirm]  = useState('');
-  const [phone,    setPhone]    = useState('');
   const navigate = useNavigate();
+
+
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirm: '',
+    role: 'seeker'
+  });
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleRoleChange = (event, value) => {
+    if (value) {
+      setFormData({
+        ...formData,
+        role: value
+      });
+    }
+  };
+
   const handleSignup = () => {
-    if (!name || !email || !password || !confirm || !phone) { alert('Fill all fields!'); return; }
-    if (password !== confirm) { alert('Passwords do not match!'); return; }
-    localStorage.setItem('user', JSON.stringify({ name, email, role, phone }));
+    const { name, email, phone, password, confirm, role } = formData;
+
+    if (!name || !email || !phone || !password || !confirm) {
+      alert('Fill all fields!');
+      return;
+    }
+
+    if (password !== confirm) {
+      alert('Passwords do not match!');
+      return;
+    }
+
+    localStorage.setItem(
+      'user',
+      JSON.stringify({ name, email, role, phone })
+    );
+
     alert('Account Created! Please Login.');
     navigate('/login');
   };
 
   return (
-    <Box sx={{ minHeight:'100vh', background:'#eff6ff',
-      display:'flex', justifyContent:'center', alignItems:'center', py:4 }}>
-      <Paper elevation={4} sx={{ p:4, borderRadius:3, width:400 }}>
+    <Box sx={{
+      minHeight: '100vh',
+      background: '#eff6ff',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      py: 4
+    }}>
 
-        <Typography variant="h6" fontWeight="bold" textAlign="center" color="#2563eb" mb={0.5}>
+      <Paper elevation={4} sx={{ p: 4, borderRadius: 3, width: 400 }}>
+
+        <Typography variant="h6" fontWeight="bold" textAlign="center" color="#2563eb">
           💼 JobPortal
         </Typography>
-        <Typography variant="h6" fontWeight="bold" textAlign="center" mb={0.5}>
+
+        <Typography variant="h6" fontWeight="bold" textAlign="center">
           Create Your Account
         </Typography>
+
         <Typography textAlign="center" color="#6b7280" fontSize="13px" mb={2}>
           Join thousands of job seekers today
         </Typography>
 
-        <Box sx={{ display:'flex', justifyContent:'center', mb:2 }}>
-          <ToggleButtonGroup value={role} exclusive size="small"
-            onChange={(e, val) => val && setRole(val)}>
-            <ToggleButton value="seeker"   sx={{ textTransform:'none', px:3 }}>Job Seeker</ToggleButton>
-            <ToggleButton value="employer" sx={{ textTransform:'none', px:3 }}>Employer</ToggleButton>
+        {/* ROLE SELECTION */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+          <ToggleButtonGroup
+            value={formData.role}
+            exclusive
+            size="small"
+            onChange={handleRoleChange}
+          >
+            <ToggleButton value="seeker" sx={{ textTransform: 'none' }}>
+              Job Seeker
+            </ToggleButton>
+
+            <ToggleButton value="employer" sx={{ textTransform: 'none' }}>
+              Employer
+            </ToggleButton>
           </ToggleButtonGroup>
         </Box>
 
-        <TextField fullWidth size="small" placeholder="Full Name"
-          value={name}     onChange={e => setName(e.target.value)}     sx={{ mb:2 }} />
-        <TextField fullWidth size="small" placeholder="Email Address" type="email"
-          value={email}    onChange={e => setEmail(e.target.value)}    sx={{ mb:2 }} />
-        <TextField fullWidth size="small" placeholder="Phone Number"
-          value={phone}    onChange={e => setPhone(e.target.value)}    sx={{ mb:2 }} />
-        <TextField fullWidth size="small" placeholder="Password" type="password"
-          value={password} onChange={e => setPassword(e.target.value)} sx={{ mb:2 }} />
-        <TextField fullWidth size="small" placeholder="Confirm Password" type="password"
-          value={confirm}  onChange={e => setConfirm(e.target.value)}  sx={{ mb:3 }} />
+        {/* INPUTS */}
+        <TextField
+          fullWidth
+          size="small"
+          name="name"
+          placeholder="Full Name"
+          value={formData.name}
+          onChange={handleChange}
+          sx={{ mb: 2 }}
+        />
 
-        <Button fullWidth variant="contained" onClick={handleSignup}
-          sx={{ background:'#2563eb', textTransform:'none', mb:2 }}>
+        <TextField
+          fullWidth
+          size="small"
+          name="email"
+          placeholder="Email Address"
+          value={formData.email}
+          onChange={handleChange}
+          sx={{ mb: 2 }}
+        />
+
+        <TextField
+          fullWidth
+          size="small"
+          name="phone"
+          placeholder="Phone Number"
+          value={formData.phone}
+          onChange={handleChange}
+          sx={{ mb: 2 }}
+        />
+
+        <TextField
+          fullWidth
+          size="small"
+          name="password"
+          type="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+          sx={{ mb: 2 }}
+        />
+
+        <TextField
+          fullWidth
+          size="small"
+          name="confirm"
+          type="password"
+          placeholder="Confirm Password"
+          value={formData.confirm}
+          onChange={handleChange}
+          sx={{ mb: 3 }}
+        />
+
+        {/* BUTTON */}
+        <Button
+          fullWidth
+          variant="contained"
+          onClick={handleSignup}
+          sx={{ background: '#2563eb', textTransform: 'none' }}
+        >
           Sign Up
         </Button>
-        <Typography textAlign="center" fontSize="14px">
+
+        <Typography textAlign="center" fontSize="14px" mt={2}>
           Already have account?{' '}
-          <Link to="/login" style={{ color:'#2563eb', fontWeight:'bold' }}>Log in</Link>
+          <Link to="/login" style={{ color: '#2563eb', fontWeight: 'bold' }}>
+            Login
+          </Link>
         </Typography>
 
       </Paper>
     </Box>
   );
 }
+
 export default Signup;
