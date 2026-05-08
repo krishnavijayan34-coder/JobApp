@@ -1,56 +1,42 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {Box,Typography,AppBar,Toolbar,Button,Card,CardContent,Chip,Avatar} from '@mui/material';
+import {
+  Box, Typography, AppBar, Toolbar, Button,
+  Card, Chip, Avatar
+} from '@mui/material';
 
 const postedJobsData = [
-  {
-    title:'Frontend Developer',
-    applicants:24,
-    status:'Active'
-  },
-  {
-    title:'UI/UX Designer',
-    applicants:18,
-    status:'Active'
-  },
-  {
-    title:'React Developer',
-    applicants:31,
-    status:'Closed'
-  },
+  { title: 'Frontend Developer', applicants: 24, status: 'Active' },
+  { title: 'UI/UX Designer', applicants: 18, status: 'Active' },
+  { title: 'React Developer', applicants: 31, status: 'Closed' },
 ];
 
 const candidates = [
-  {
-    name:'Sree Renjini',
-    job:'Frontend Developer',
-    status:'Under Review',
-    exp:'Fresher'
-  },
-  {
-    name:'Priya Nair',
-    job:'UI/UX Designer',
-    status:'Interview',
-    exp:'1 year'
-  },
+  { name: 'Sree Renjini', job: 'Frontend Developer', status: 'Under Review', exp: 'Fresher' },
+  { name: 'Priya Nair', job: 'UI/UX Designer', status: 'Interview', exp: '1 year' },
 ];
 
 const statusColor = {
-  'Under Review':'warning',
-  'Interview':'info',
-  'Shortlisted':'success',
-  'Rejected':'error'
+  'Under Review': 'warning',
+  'Interview': 'info',
+  'Shortlisted': 'success',
+  'Rejected': 'error'
 };
 
 function EmployerDashboard() {
 
   const user = JSON.parse(localStorage.getItem('user'));
-
   const navigate = useNavigate();
 
   const [tab, setTab] = useState('jobs');
-
   const [jobs, setJobs] = useState(postedJobsData);
+
+  // PROFILE STATE
+  const [profile, setProfile] = useState({
+    company: 'Mk Solutions',
+    email: 'hr@mksolutions.com',
+    location: 'Trivandrum'
+  });
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -58,10 +44,11 @@ function EmployerDashboard() {
   };
 
   return (
-    <Box sx={{ background:'#f5f5f5', minHeight:'100vh' }}>
+    <Box sx={{ background: '#f5f5f5', minHeight: '100vh' }}>
 
-      <AppBar position="static" sx={{ background:'#7c3aed' }}>
-        <Toolbar sx={{ justifyContent:'space-between' }}>
+      {/* HEADER */}
+      <AppBar position="static" sx={{ background: '#7c3aed' }}>
+        <Toolbar sx={{ justifyContent: 'space-between' }}>
 
           <Box>
             <Typography fontWeight="bold">
@@ -73,17 +60,16 @@ function EmployerDashboard() {
             </Typography>
           </Box>
 
-          <Box sx={{ display:'flex', gap:1 }}>
+          <Box sx={{ display: 'flex', gap: 1 }}>
 
-            {['jobs','candidates'].map(t => (
+            {['jobs', 'candidates', 'profile'].map(t => (
               <Button
                 key={t}
                 color="inherit"
                 onClick={() => setTab(t)}
                 sx={{
-                  textTransform:'none',
-                  borderBottom:
-                    tab===t ? '2px solid white' : 'none'
+                  textTransform: 'none',
+                  borderBottom: tab === t ? '2px solid white' : 'none'
                 }}
               >
                 {t.charAt(0).toUpperCase() + t.slice(1)}
@@ -93,7 +79,7 @@ function EmployerDashboard() {
             <Button
               color="inherit"
               onClick={handleLogout}
-              sx={{ textTransform:'none' }}
+              sx={{ textTransform: 'none' }}
             >
               Logout
             </Button>
@@ -103,88 +89,63 @@ function EmployerDashboard() {
         </Toolbar>
       </AppBar>
 
-      <Box sx={{ p:3 }}>
+      <Box sx={{ p: 3 }}>
 
+        {/* JOBS */}
         {tab === 'jobs' && (
           <>
-
             <Button
               variant="contained"
-              sx={{
-                mb:2,
-                textTransform:'none',
-                background:'#7c3aed'
-              }}
+              sx={{ mb: 2, textTransform: 'none', background: '#7c3aed' }}
               onClick={() =>
                 setJobs([
                   ...jobs,
-                  {
-                    title:'New Developer',
-                    applicants:0,
-                    status:'Active'
-                  }
+                  { title: 'New Developer', applicants: 0, status: 'Active' }
                 ])
               }
             >
               Post New Job
             </Button>
 
-            <Card sx={{ borderRadius:3 }}>
+            <Card sx={{ borderRadius: 3 }}>
 
-              {jobs.map((job,i) => (
+              {jobs.map((job, i) => (
                 <Box
                   key={i}
                   sx={{
-                    display:'flex',
-                    justifyContent:'space-between',
-                    alignItems:'center',
-                    p:2,
-                    borderBottom:
-                      i < jobs.length-1
-                        ? '1px solid #f0f0f0'
-                        : 'none'
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    p: 2,
+                    borderBottom: i < jobs.length - 1 ? '1px solid #f0f0f0' : 'none'
                   }}
                 >
-
                   <Box>
-                    <Typography fontWeight="bold">
-                      {job.title}
-                    </Typography>
-
-                    <Typography
-                      color="#6b7280"
-                      fontSize="12px"
-                    >
+                    <Typography fontWeight="bold">{job.title}</Typography>
+                    <Typography fontSize="12px" color="#6b7280">
                       {job.applicants} applicants
                     </Typography>
                   </Box>
 
-                  <Box sx={{ display:'flex', gap:1 }}>
+                  <Box sx={{ display: 'flex', gap: 1 }}>
 
                     <Chip
                       label={job.status}
                       size="small"
-                      color={
-                        job.status==='Active'
-                          ? 'success'
-                          : 'default'
-                      }
+                      color={job.status === 'Active' ? 'success' : 'default'}
                     />
 
                     <Button
                       color="error"
                       size="small"
                       onClick={() =>
-                        setJobs(
-                          jobs.filter((_, index) => index !== i)
-                        )
+                        setJobs(jobs.filter((_, index) => index !== i))
                       }
                     >
                       Delete
                     </Button>
 
                   </Box>
-
                 </Box>
               ))}
 
@@ -192,39 +153,30 @@ function EmployerDashboard() {
           </>
         )}
 
+        {/* CANDIDATES */}
         {tab === 'candidates' && (
-          <Card sx={{ borderRadius:3 }}>
+          <Card sx={{ borderRadius: 3 }}>
 
-            {candidates.map((c,i) => (
+            {candidates.map((c, i) => (
               <Box
                 key={i}
                 sx={{
-                  display:'flex',
-                  justifyContent:'space-between',
-                  alignItems:'center',
-                  p:2,
-                  borderBottom:
-                    i < candidates.length-1
-                      ? '1px solid #f0f0f0'
-                      : 'none'
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  p: 2,
+                  borderBottom: i < candidates.length - 1 ? '1px solid #f0f0f0' : 'none'
                 }}
               >
+                <Box sx={{ display: 'flex', gap: 2 }}>
 
-                <Box sx={{ display:'flex', gap:2 }}>
-
-                  <Avatar sx={{ background:'#7c3aed' }}>
+                  <Avatar sx={{ background: '#7c3aed' }}>
                     {c.name.charAt(0)}
                   </Avatar>
 
                   <Box>
-                    <Typography fontWeight="bold">
-                      {c.name}
-                    </Typography>
-
-                    <Typography
-                      color="#6b7280"
-                      fontSize="12px"
-                    >
+                    <Typography fontWeight="bold">{c.name}</Typography>
+                    <Typography fontSize="12px" color="#6b7280">
                       {c.job} • {c.exp}
                     </Typography>
                   </Box>
@@ -236,9 +188,31 @@ function EmployerDashboard() {
                   size="small"
                   color={statusColor[c.status]}
                 />
-
               </Box>
             ))}
+
+          </Card>
+        )}
+
+        {/* PROFILE */}
+        {tab === 'profile' && (
+          <Card sx={{ p: 3, borderRadius: 3 }}>
+
+            <Typography fontWeight="bold" fontSize="18px" mb={1}>
+              Company Profile
+            </Typography>
+
+            <Typography color="#6b7280">
+              Company: {profile.company}
+            </Typography>
+
+            <Typography color="#6b7280">
+              Email: {profile.email}
+            </Typography>
+
+            <Typography color="#6b7280">
+              Location: {profile.location}
+            </Typography>
 
           </Card>
         )}
