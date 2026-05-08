@@ -1,15 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Box,
-  Typography,
-  AppBar,
-  Toolbar,
-  Button,
-  Card,
-  Chip,
-  Avatar
-} from '@mui/material';
+import {Box,Typography,AppBar,Toolbar,Button,Card,Chip,Avatar} from '@mui/material';
 
 const allUsersData = [
   {
@@ -54,13 +45,13 @@ const reports = [
   },
   {
     label:'Applications',
-    value:42,
+    value:5,
     icon:'📄'
   },
 ];
 
 const roleColor = {
-  seeker:'info',
+  seeker:'error',
   employer:'secondary'
 };
 
