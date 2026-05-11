@@ -1,19 +1,45 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import {
-  Box, Typography, AppBar, Toolbar, Button,
-  Card, Chip, Avatar
+  Box,Typography,AppBar,Toolbar,Button,Card, Chip, Avatar,Dialog, DialogTitle,
+  DialogContent,DialogActions,TextField,MenuItem
 } from '@mui/material';
 
 const postedJobsData = [
-  { title: 'Frontend Developer', applicants: 24, status: 'Active' },
-  { title: 'UI/UX Designer', applicants: 18, status: 'Active' },
-  { title: 'React Developer', applicants: 31, status: 'Closed' },
+  {
+    title: 'Frontend Developer',
+    applicants: 24,
+    status: 'Active',
+    experience: 'Experienced'
+  },
+  {
+    title: 'UI/UX Designer',
+    applicants: 18,
+    status: 'Active',
+    experience: 'Fresher'
+  },
+  {
+    title: 'React Developer',
+    applicants: 31,
+    status: 'Closed',
+    experience: 'Experienced'
+  },
 ];
 
 const candidates = [
-  { name: 'Sree Renjini', job: 'Frontend Developer', status: 'Under Review', exp: 'Fresher' },
-  { name: 'Priya Nair', job: 'UI/UX Designer', status: 'Interview', exp: '1 year' },
+  {
+    name: 'Sree Renjini',
+    job: 'Frontend Developer',
+    status: 'Under Review',
+    exp: 'Fresher'
+  },
+  {
+    name: 'Priya Nair',
+    job: 'UI/UX Designer',
+    status: 'Interview',
+    exp: '1 year'
+  },
 ];
 
 const statusColor = {
@@ -26,12 +52,22 @@ const statusColor = {
 function EmployerDashboard() {
 
   const user = JSON.parse(localStorage.getItem('user'));
+
   const navigate = useNavigate();
 
   const [tab, setTab] = useState('jobs');
+
   const [jobs, setJobs] = useState(postedJobsData);
 
-  // PROFILE STATE
+  const [open, setOpen] = useState(false);
+
+  const [newJob, setNewJob] = useState({
+    title: '',
+    applicants: 0,
+    status: 'Active',
+    experience: 'Fresher'
+  });
+
   const [profile, setProfile] = useState({
     company: 'Mk Solutions',
     email: 'hr@mksolutions.com',
@@ -43,14 +79,32 @@ function EmployerDashboard() {
     navigate('/');
   };
 
+  const handleCreateJob = () => {
+
+    setJobs([
+      ...jobs,
+      newJob
+    ]);
+
+    setNewJob({
+      title: '',
+      applicants: 0,
+      status: 'Active',
+      experience: 'Fresher'
+    });
+
+    setOpen(false);
+  };
+
   return (
     <Box sx={{ background: '#f5f5f5', minHeight: '100vh' }}>
 
-      {/* HEADER */}
       <AppBar position="static" sx={{ background: '#7c3aed' }}>
+
         <Toolbar sx={{ justifyContent: 'space-between' }}>
 
           <Box>
+
             <Typography fontWeight="bold">
               Hello, {user?.name?.split(' ')[0]} 👔
             </Typography>
@@ -58,6 +112,7 @@ function EmployerDashboard() {
             <Typography fontSize="12px" color="#ddd8fe">
               Employer Dashboard
             </Typography>
+
           </Box>
 
           <Box sx={{ display: 'flex', gap: 1 }}>
@@ -69,7 +124,8 @@ function EmployerDashboard() {
                 onClick={() => setTab(t)}
                 sx={{
                   textTransform: 'none',
-                  borderBottom: tab === t ? '2px solid white' : 'none'
+                  borderBottom:
+                    tab === t ? '2px solid white' : 'none'
                 }}
               >
                 {t.charAt(0).toUpperCase() + t.slice(1)}
@@ -87,22 +143,23 @@ function EmployerDashboard() {
           </Box>
 
         </Toolbar>
+
       </AppBar>
 
       <Box sx={{ p: 3 }}>
 
-        {/* JOBS */}
+        
         {tab === 'jobs' && (
           <>
+
             <Button
               variant="contained"
-              sx={{ mb: 2, textTransform: 'none', background: '#7c3aed' }}
-              onClick={() =>
-                setJobs([
-                  ...jobs,
-                  { title: 'New Developer', applicants: 0, status: 'Active' }
-                ])
-              }
+              sx={{
+                mb: 2,
+                textTransform: 'none',
+                background: '#7c3aed'
+              }}
+              onClick={() => setOpen(true)}
             >
               Post New Job
             </Button>
@@ -117,14 +174,26 @@ function EmployerDashboard() {
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     p: 2,
-                    borderBottom: i < jobs.length - 1 ? '1px solid #f0f0f0' : 'none'
+                    borderBottom:
+                      i < jobs.length - 1
+                        ? '1px solid #f0f0f0'
+                        : 'none'
                   }}
                 >
+
                   <Box>
-                    <Typography fontWeight="bold">{job.title}</Typography>
-                    <Typography fontSize="12px" color="#6b7280">
-                      {job.applicants} applicants
+
+                    <Typography fontWeight="bold">
+                      {job.title}
                     </Typography>
+
+                    <Typography
+                      fontSize="12px"
+                      color="#6b7280"
+                    >
+                      {job.experience} • {job.applicants} applicants
+                    </Typography>
+
                   </Box>
 
                   <Box sx={{ display: 'flex', gap: 1 }}>
@@ -132,24 +201,32 @@ function EmployerDashboard() {
                     <Chip
                       label={job.status}
                       size="small"
-                      color={job.status === 'Active' ? 'success' : 'default'}
+                      color={
+                        job.status === 'Active'
+                          ? 'success'
+                          : 'default'
+                      }
                     />
 
                     <Button
                       color="error"
                       size="small"
                       onClick={() =>
-                        setJobs(jobs.filter((_, index) => index !== i))
+                        setJobs(
+                          jobs.filter((_, index) => index !== i)
+                        )
                       }
                     >
                       Delete
                     </Button>
 
                   </Box>
+
                 </Box>
               ))}
 
             </Card>
+
           </>
         )}
 
@@ -165,9 +242,13 @@ function EmployerDashboard() {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   p: 2,
-                  borderBottom: i < candidates.length - 1 ? '1px solid #f0f0f0' : 'none'
+                  borderBottom:
+                    i < candidates.length - 1
+                      ? '1px solid #f0f0f0'
+                      : 'none'
                 }}
               >
+
                 <Box sx={{ display: 'flex', gap: 2 }}>
 
                   <Avatar sx={{ background: '#7c3aed' }}>
@@ -175,10 +256,18 @@ function EmployerDashboard() {
                   </Avatar>
 
                   <Box>
-                    <Typography fontWeight="bold">{c.name}</Typography>
-                    <Typography fontSize="12px" color="#6b7280">
+
+                    <Typography fontWeight="bold">
+                      {c.name}
+                    </Typography>
+
+                    <Typography
+                      fontSize="12px"
+                      color="#6b7280"
+                    >
                       {c.job} • {c.exp}
                     </Typography>
+
                   </Box>
 
                 </Box>
@@ -188,17 +277,22 @@ function EmployerDashboard() {
                   size="small"
                   color={statusColor[c.status]}
                 />
+
               </Box>
             ))}
 
           </Card>
         )}
 
-        {/* PROFILE */}
+        
         {tab === 'profile' && (
           <Card sx={{ p: 3, borderRadius: 3 }}>
 
-            <Typography fontWeight="bold" fontSize="18px" mb={1}>
+            <Typography
+              fontWeight="bold"
+              fontSize="18px"
+              mb={1}
+            >
               Company Profile
             </Typography>
 
@@ -218,6 +312,92 @@ function EmployerDashboard() {
         )}
 
       </Box>
+
+      
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        fullWidth
+      >
+
+        <DialogTitle>
+          Create New Job
+        </DialogTitle>
+
+        <DialogContent
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            mt: 1
+          }}
+        >
+
+          <TextField
+            label="Job Title"
+            value={newJob.title}
+            onChange={(e) =>
+              setNewJob({
+                ...newJob,
+                title: e.target.value
+              })
+            }
+          />
+
+          <TextField
+            select
+            label="Experience"
+            value={newJob.experience}
+            onChange={(e) =>
+              setNewJob({
+                ...newJob,
+                experience: e.target.value
+              })
+            }
+          >
+
+            <MenuItem value="Fresher">
+              Fresher
+            </MenuItem>
+
+            <MenuItem value="Experienced">
+              Experienced
+            </MenuItem>
+
+          </TextField>
+
+          <TextField
+            type="number"
+            label="Applicants"
+            value={newJob.applicants}
+            onChange={(e) =>
+              setNewJob({
+                ...newJob,
+                applicants: e.target.value
+              })
+            }
+          />
+
+        </DialogContent>
+
+        <DialogActions>
+
+          <Button onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+
+          <Button
+            variant="contained"
+            onClick={handleCreateJob}
+            sx={{ background: '#7c3aed' }}
+          >
+            Create Job
+          </Button>
+
+        </DialogActions>
+
+      </Dialog>
+
     </Box>
   );
 }
