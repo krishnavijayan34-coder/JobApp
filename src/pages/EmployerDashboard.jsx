@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import {
-  Box,Typography,AppBar,Toolbar,Button,Card, Chip, Avatar,Dialog, DialogTitle,
-  DialogContent,DialogActions,TextField,MenuItem
+import {Box,Typography,AppBar,Toolbar,Button,Card,Chip,Avatar,Dialog,DialogTitle,DialogContent,DialogActions,
+  TextField,MenuItem
 } from '@mui/material';
 
 const postedJobsData = [
@@ -11,19 +9,22 @@ const postedJobsData = [
     title: 'Frontend Developer',
     applicants: 24,
     status: 'Active',
-    experience: 'Experienced'
+    experience: 'Experienced',
+    skill: 'React JS'
   },
   {
     title: 'UI/UX Designer',
     applicants: 18,
     status: 'Active',
-    experience: 'Fresher'
+    experience: 'Fresher',
+    skill: 'Figma'
   },
   {
     title: 'React Developer',
     applicants: 31,
     status: 'Closed',
-    experience: 'Experienced'
+    experience: 'Experienced',
+    skill: 'JavaScript'
   },
 ];
 
@@ -65,7 +66,8 @@ function EmployerDashboard() {
     title: '',
     applicants: 0,
     status: 'Active',
-    experience: 'Fresher'
+    experience: 'Fresher',
+    skill: 'React JS'
   });
 
   const [profile, setProfile] = useState({
@@ -90,7 +92,8 @@ function EmployerDashboard() {
       title: '',
       applicants: 0,
       status: 'Active',
-      experience: 'Fresher'
+      experience: 'Fresher',
+      skill: 'React JS'
     });
 
     setOpen(false);
@@ -148,7 +151,7 @@ function EmployerDashboard() {
 
       <Box sx={{ p: 3 }}>
 
-        
+        {/* JOBS */}
         {tab === 'jobs' && (
           <>
 
@@ -191,7 +194,7 @@ function EmployerDashboard() {
                       fontSize="12px"
                       color="#6b7280"
                     >
-                      {job.experience} • {job.applicants} applicants
+                      {job.experience} • {job.skill} • {job.applicants} applicants
                     </Typography>
 
                   </Box>
@@ -284,7 +287,7 @@ function EmployerDashboard() {
           </Card>
         )}
 
-        
+        {/* PROFILE */}
         {tab === 'profile' && (
           <Card sx={{ p: 3, borderRadius: 3 }}>
 
@@ -313,7 +316,7 @@ function EmployerDashboard() {
 
       </Box>
 
-      
+      {/* DIALOG BOX */}
       <Dialog
         open={open}
         onClose={() => setOpen(false)}
@@ -362,6 +365,40 @@ function EmployerDashboard() {
 
             <MenuItem value="Experienced">
               Experienced
+            </MenuItem>
+
+          </TextField>
+
+          <TextField
+            select
+            label="Skills Required"
+            value={newJob.skill}
+            onChange={(e) =>
+              setNewJob({
+                ...newJob,
+                skill: e.target.value
+              })
+            }
+          >
+
+            <MenuItem value="React JS">
+              React JS
+            </MenuItem>
+
+            <MenuItem value="JavaScript">
+              JavaScript
+            </MenuItem>
+
+            <MenuItem value="Python">
+              Python
+            </MenuItem>
+
+            <MenuItem value="UI/UX">
+              UI/UX
+            </MenuItem>
+
+            <MenuItem value="Node JS">
+              Node JS
             </MenuItem>
 
           </TextField>
