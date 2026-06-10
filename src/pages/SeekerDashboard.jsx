@@ -1,393 +1,353 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Box, Typography, AppBar, Toolbar, Button, Card, CardContent,
-         Chip, TextField, MenuItem, Avatar, Divider } from '@mui/material';
-import JobCard from '../components/JobCard';
-import { getAllJobs } from '../api/jobApi';
-const allJobs = getAllJobs();
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Box,
+  Typography,
+  AppBar,
+  Toolbar,
+  Button,
+  Card,
+  CardContent,
+  TextField,
+  MenuItem,
+} from "@mui/material";
+
+import JobCard from "../components/JobCard";
+import { getSavedJobs, saveJob } from "../api/savedJobApi";
 
 function SeekerDashboard() {
-
-  const user = JSON.parse(localStorage.getItem('user'));
+  const user = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
 
-  const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState('All');
+  const [jobs, setJobs] = useState([]);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("All");
+
   const [applied, setApplied] = useState([]);
   const [saved, setSaved] = useState([]);
-  const [tab, setTab] = useState('jobs');
+  const [applications, setApplications] = useState([]);
+  const [profile, setProfile] = useState(null);
+  const [tab, setTab] = useState("jobs");
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    navigate('/');
+  // ================= JOBS =================
+  useEffect(() => {
+    fetch("http://localhost:5000/api/jobs")
+      .then((res) => res.json())
+      .then((data) => setJobs(Array.isArray(data) ? data : []))
+      .catch(console.log);
+  }, []);
+
+  // ================= SAVED JOBS =================
+  const fetchSavedJobs = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await getSavedJobs(token);
+
+      const data = res?.data || res || [];
+
+      const ids = Array.isArray(data)
+        ? data
+            .map((x) => {
+              if (typeof x === "number") return x;
+              if (x?.jobId) return Number(x.jobId);
+              if (x?.job?.jobId) return Number(x.job.jobId);
+              return null;
+            })
+            .filter(Boolean)
+        : [];
+
+      setSaved([...new Set(ids)]); // 🔥 remove duplicates
+    } catch (err) {
+      console.log(err);
+      setSaved([]);
+    }
   };
 
-  const filtered = allJobs.filter(j =>
-    (filter === 'All' || j.type === filter) &&
-    (
-      j.title.toLowerCase().includes(search.toLowerCase()) ||
-      j.company.toLowerCase().includes(search.toLowerCase())
-    )
+  useEffect(() => {
+    fetchSavedJobs();
+  }, []);
+
+  // ================= APPLICATIONS =================
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(
+          "http://localhost:5000/api/application/my",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const data = await res.json();
+
+        if (Array.isArray(data)) {
+          setApplications(data);
+          setApplied([...new Set(data.map((a) => Number(a.jobId)))]);
+        } else {
+          setApplications([]);
+          setApplied([]);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchApplications();
+  }, []);
+
+  // ================= PROFILE =================
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(
+          "http://localhost:5000/api/jobseeker/profile",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const data = await res.json();
+        setProfile(data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  // ================= APPLY =================
+  const handleApply = async (jobId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(
+        "http://localhost:5000/api/application/apply",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ jobId }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setApplied((prev) => [...new Set([...prev, Number(jobId)])]);
+        setApplications((prev) => [...prev, data]);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // ================= SAVE JOB =================
+  const handleSave = async (jobId) => {
+    try {
+      const token = localStorage.getItem("token");
+      await saveJob(jobId, token);
+
+      // 🔥 re-fetch instead of manual push
+      fetchSavedJobs();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // ================= FILTER =================
+  const filtered = jobs.filter(
+    (j) =>
+      (filter === "All" || j.jobType === filter) &&
+      (j.title?.toLowerCase().includes(search.toLowerCase()) ||
+        j.company?.companyName?.toLowerCase().includes(search.toLowerCase()))
   );
 
-  const appliedJobs = allJobs.filter(j =>
-    applied.includes(j.id)
-  );
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/");
+  };
 
   return (
-    <Box sx={{ background:'#f5f5f5', minHeight:'100vh' }}>
-
-      <AppBar position="static" sx={{ background:'#2563eb' }}>
-        <Toolbar sx={{ justifyContent:'space-between' }}>
+    <Box sx={{ minHeight: "100vh", background: "#f5f5f5" }}>
+      {/* HEADER */}
+      <AppBar position="static">
+        <Toolbar sx={{ justifyContent: "space-between" }}>
+          <Typography>
+            Hello {user?.name?.split(" ")[0]} 👋
+          </Typography>
 
           <Box>
-            <Typography fontWeight="bold">
-              Hello, {user?.name?.split(' ')[0]} 👋
-            </Typography>
-
-            <Typography fontSize="12px" color="#bfdbfe">
-              Job Seeker Dashboard
-            </Typography>
-          </Box>
-
-          <Box sx={{ display:'flex', gap:1 }}>
-
-            {['jobs','saved','applications','profile'].map(t => (
+            {["jobs", "saved", "applications", "profile"].map((t) => (
               <Button
                 key={t}
-                color="inherit"
                 onClick={() => setTab(t)}
-                sx={{
-                  textTransform:'none',
-                  borderBottom:
-                    tab===t ? '2px solid white' : 'none'
-                }}
+                sx={{ color: "white" }}
               >
-                {t.charAt(0).toUpperCase() + t.slice(1)}
+                {t}
               </Button>
             ))}
-
-            <Button
-              color="inherit"
-              onClick={handleLogout}
-              sx={{ textTransform:'none' }}
-            >
+            <Button onClick={handleLogout} sx={{ color: "white" }}>
               Logout
             </Button>
-
           </Box>
         </Toolbar>
       </AppBar>
 
-      <Box sx={{ p:3 }}>
+      <Box p={3}>
+        {/* STATS */}
+        <Card sx={{ mb: 2 }}>
+          <CardContent sx={{ display: "flex", justifyContent: "space-around" }}>
+            <Box sx={{ textAlign: "center" }}>
+              <Typography fontSize={20}>{applied.length}</Typography>
+              <Typography>Applications</Typography>
+            </Box>
 
-        <Card sx={{ mb:3, borderRadius:3 }}>
-          <CardContent>
-
-            <Box
-              sx={{
-                display:'flex',
-                justifyContent:'space-around',
-                textAlign:'center'
-              }}
-            >
-
-              {[
-                {
-                  icon:'📄',
-                  n:appliedJobs.length,
-                  l:'Applications'
-                },
-                {
-                  icon:'📞',
-                  n:0,
-                  l:'Interviews'
-                },
-                {
-                  icon:'🎁',
-                  n:0,
-                  l:'Offers'
-                },
-                {
-                  icon:'🔖',
-                  n:saved.length,
-                  l:'Saved Jobs'
-                },
-              ].map((s,i) => (
-                <Box key={i}>
-                  <Typography fontSize="24px">
-                    {s.icon}
-                  </Typography>
-
-                  <Typography
-                    fontWeight="bold"
-                    fontSize="20px"
-                  >
-                    {s.n}
-                  </Typography>
-
-                  <Typography
-                    color="#6b7280"
-                    fontSize="12px"
-                  >
-                    {s.l}
-                  </Typography>
-                </Box>
-              ))}
-
+            <Box sx={{ textAlign: "center" }}>
+              <Typography fontSize={20}>{saved.length}</Typography>
+              <Typography>Saved</Typography>
             </Box>
           </CardContent>
         </Card>
 
-        {tab === 'jobs' && (
+        {/* JOBS */}
+        {tab === "jobs" && (
           <>
-
-            <Box sx={{ display:'flex', gap:2, mb:3 }}>
-
+            <Box display="flex" gap={2} mb={2}>
               <TextField
                 fullWidth
                 size="small"
-                placeholder="Search job or company..."
+                placeholder="Search jobs"
                 value={search}
-                onChange={e => setSearch(e.target.value)}
+                onChange={(e) => setSearch(e.target.value)}
               />
 
               <TextField
                 select
                 size="small"
                 value={filter}
-                onChange={e => setFilter(e.target.value)}
-                sx={{ minWidth:140 }}
+                onChange={(e) => setFilter(e.target.value)}
+                sx={{ width: 150 }}
               >
-
-                {['All','Full-time','Remote','Hybrid'].map(t => (
-                  <MenuItem key={t} value={t}>
-                    {t}
-                  </MenuItem>
-                ))}
-
+                <MenuItem value="All">All</MenuItem>
+                <MenuItem value="Full-time">Full-time</MenuItem>
+                <MenuItem value="Remote">Remote</MenuItem>
+                <MenuItem value="Hybrid">Hybrid</MenuItem>
               </TextField>
             </Box>
 
-            <Typography fontWeight="bold" mb={1.5}>
-              Available Jobs
-            </Typography>
-
             <Box
               sx={{
-                display:'grid',
-                gridTemplateColumns:'repeat(auto-fill,minmax(240px,1fr))',
-                gap:2
+                display: "grid",
+                gridTemplateColumns:
+                  "repeat(auto-fill,minmax(250px,1fr))",
+                gap: 2,
               }}
             >
-
-              {filtered.map(job => (
+              {filtered.map((job) => (
                 <JobCard
-                  key={job.id}
-                  {...job}
-                  applied={applied.includes(job.id)}
-                  onApply={() => setApplied(p => [...p, job.id])}
-                  onSave={() => setSaved(p => [...p, job.id])}
+                  key={job.jobId}
+                  title={job.title}
+                  company={job.company?.companyName}
+                  location={job.location}
+                  salary={job.salary}
+                  type={job.jobType}
+                  applied={applied.includes(Number(job.jobId))}
+                  onApply={() => handleApply(job.jobId)}
+                  onSave={() => handleSave(job.jobId)}
                 />
               ))}
-
             </Box>
           </>
         )}
 
-        {tab === 'saved' && (
-          <>
-            <Typography fontWeight="bold" mb={1.5}>
+        {/* SAVED */}
+        {tab === "saved" && (
+          <Box>
+            <Typography mb={2} fontWeight="bold">
               Saved Jobs
             </Typography>
 
-            {saved.length === 0 ? (
-              <Typography color="#6b7280">
-                No saved jobs yet.
-              </Typography>
-            ) : (
-              <Box
-                sx={{
-                  display:'grid',
-                  gridTemplateColumns:'repeat(auto-fill,minmax(240px,1fr))',
-                  gap:2
-                }}
-              >
-                {allJobs
-                  .filter(job => saved.includes(job.id))
-                  .map(job => (
-                    <JobCard
-                      key={job.id}
-                      {...job}
-                      applied={applied.includes(job.id)}
-                      onApply={() => setApplied(p => [...p, job.id])}
-                    />
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns:
+                  "repeat(auto-fill,minmax(250px,1fr))",
+                gap: 2,
+              }}
+            >
+              {jobs
+                .filter((j) => saved.includes(Number(j.jobId)))
+                .map((job) => (
+                  <JobCard
+                    key={job.jobId}
+                    title={job.title}
+                    company={job.company?.companyName}
+                    location={job.location}
+                    salary={job.salary}
+                    type={job.jobType}
+                  />
                 ))}
-              </Box>
-            )}
-          </>
+            </Box>
+          </Box>
         )}
 
-        {tab === 'applications' && (
-          <>
-            <Typography fontWeight="bold" mb={1.5}>
+        {/* APPLICATIONS */}
+        {tab === "applications" && (
+          <Box>
+            <Typography mb={2} fontWeight="bold">
               My Applications
             </Typography>
 
-            {appliedJobs.length === 0
-              ? (
-                <Typography color="#6b7280">
-                  You haven't applied to any jobs yet.
-                </Typography>
-              )
-              : (
-                <Card sx={{ borderRadius:3 }}>
+            {applications.length === 0 ? (
+              <Typography>No applications yet</Typography>
+            ) : (
+              applications.map((app) => (
+                <Card key={app.applicationId} sx={{ p: 2, mb: 1 }}>
+                  <Typography fontWeight="bold">
+                    {app.job?.title}
+                  </Typography>
 
-                  {appliedJobs.map((app, i) => (
-                    <Box
-                      key={i}
-                      sx={{
-                        display:'flex',
-                        justifyContent:'space-between',
-                        alignItems:'center',
-                        p:2,
-                        borderBottom:
-                          i < appliedJobs.length-1
-                            ? '1px solid #f0f0f0'
-                            : 'none'
-                      }}
-                    >
+                  <Typography>
+                    📍 {app.job?.location} | {app.job?.jobType}
+                  </Typography>
 
-                      <Box>
-                        <Typography
-                          fontWeight="bold"
-                          fontSize="14px"
-                        >
-                          {app.title}
-                        </Typography>
+                  <Typography>
+                    💰 ₹{app.job?.salary} | 🎯 {app.job?.experience} yrs
+                  </Typography>
 
-                        <Typography
-                          color="#6b7280"
-                          fontSize="12px"
-                        >
-                          {app.company} • {app.location}
-                        </Typography>
+                  <Typography>Status: {app.status}</Typography>
 
-                        <Typography
-                          color="#9ca3af"
-                          fontSize="11px"
-                        >
-                          Applied recently
-                        </Typography>
-                      </Box>
-
-                      <Chip
-                        label="Under Review"
-                        color="warning"
-                        size="small"
-                      />
-
-                    </Box>
-                  ))}
+                  <Typography fontSize={12} color="gray">
+                    Applied:{" "}
+                    {new Date(app.appliedAt).toLocaleDateString()}
+                  </Typography>
                 </Card>
-              )
-            }
-          </>
+              ))
+            )}
+          </Box>
         )}
 
-        {tab === 'profile' && (
-          <Card sx={{ borderRadius:3, p:3 }}>
-
-            <Box
-              sx={{
-                display:'flex',
-                alignItems:'center',
-                gap:2,
-                mb:2
-              }}
-            >
-
-              <Avatar
-                sx={{
-                  width:64,
-                  height:64,
-                  background:'#2563eb',
-                  fontSize:'24px'
-                }}
-              >
-                {user?.name?.charAt(0)}
-              </Avatar>
-
-              <Box>
-                <Typography
-                  fontWeight="bold"
-                  fontSize="18px"
-                >
-                  {user?.name}
-                </Typography>
-
-                <Typography
-                  color="#6b7280"
-                  fontSize="14px"
-                >
-                  {user?.email}
-                </Typography>
-
-                <Chip
-                  label="Job Seeker"
-                  size="small"
-                  sx={{
-                    background:'#eff6ff',
-                    color:'#2563eb',
-                    mt:0.5
-                  }}
-                />
-              </Box>
-            </Box>
-
-            <Divider sx={{ mb:2 }} />
-
-            <Typography fontSize="14px" color="#6b7280">
-              📞 Phone: {user?.phone || 'Not provided'}
+        {/* PROFILE */}
+        {tab === "profile" && (
+          <Card sx={{ p: 3 }}>
+            <Typography fontWeight="bold">
+              {profile?.user?.name || user?.name}
             </Typography>
-
-            <Typography fontSize="14px" color="#6b7280" mt={1}>
-              📄 Resume: Not uploaded
+            <Typography>
+              {profile?.user?.email || user?.email}
             </Typography>
-
-            <Typography fontSize="14px" color="#6b7280" mt={1}>
-              🎓 Experience: Fresher
-            </Typography>
-
-            <Button
-              component="label"
-              variant="contained"
-              sx={{
-                mt:2,
-                textTransform:'none',
-                background:'#2563eb'
-              }}
-            >
-              Upload Resume
-              <input hidden type="file" />
-            </Button>
-
-            <Button
-              variant="outlined"
-              sx={{
-                mt:2,
-                ml:2,
-                textTransform:'none',
-                borderColor:'#2563eb',
-                color:'#2563eb'
-              }}
-            >
-              Edit Profile
-            </Button>
-
+            <Typography>📞 {profile?.contactNumber}</Typography>
+            <Typography>🎓 {profile?.qualification}</Typography>
+            <Typography>💼 {profile?.experience}</Typography>
           </Card>
         )}
-
       </Box>
     </Box>
   );

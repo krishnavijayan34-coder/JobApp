@@ -1,440 +1,218 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import {Box,Typography,AppBar,Toolbar,Button,Card,Chip,Avatar,Dialog,DialogTitle,DialogContent,DialogActions,
-  TextField,MenuItem
-} from '@mui/material';
-
-const postedJobsData = [
-  {
-    title: 'Frontend Developer',
-    applicants: 24,
-    status: 'Active',
-    experience: 'Experienced',
-    skill: 'React JS'
-  },
-  {
-    title: 'UI/UX Designer',
-    applicants: 18,
-    status: 'Active',
-    experience: 'Fresher',
-    skill: 'Figma'
-  },
-  {
-    title: 'React Developer',
-    applicants: 31,
-    status: 'Closed',
-    experience: 'Experienced',
-    skill: 'JavaScript'
-  },
-];
-
-const candidates = [
-  {
-    name: 'Sree Renjini',
-    job: 'Frontend Developer',
-    status: 'Under Review',
-    exp: 'Fresher'
-  },
-  {
-    name: 'Priya Nair',
-    job: 'UI/UX Designer',
-    status: 'Interview',
-    exp: '1 year'
-  },
-];
-
-const statusColor = {
-  'Under Review': 'warning',
-  'Interview': 'info',
-  'Shortlisted': 'success',
-  'Rejected': 'error'
-};
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Box,
+  Typography,
+  AppBar,
+  Toolbar,
+  Button,
+  Card,
+  CircularProgress,
+} from "@mui/material";
 
 function EmployerDashboard() {
-
-  const user = JSON.parse(localStorage.getItem('user'));
-
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user"));
 
-  const [tab, setTab] = useState('jobs');
+  const [jobs, setJobs] = useState([]);
+  const [applications, setApplications] = useState([]);
+  const [companies, setCompanies] = useState([]);
+  const [loadingJobs, setLoadingJobs] = useState(true);
+  const [loadingApps, setLoadingApps] = useState(false);
+  const [tab, setTab] = useState("jobs");
 
-  const [jobs, setJobs] = useState(postedJobsData);
+  // ========================
+  // FETCH JOBS + COMPANIES
+  // ========================
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [jobRes, companyRes] = await Promise.all([
+          fetch("http://localhost:5000/api/jobs"),
+          fetch("http://localhost:5000/api/company"),
+        ]);
 
-  const [open, setOpen] = useState(false);
+        const jobsData = await jobRes.json();
+        const companyData = await companyRes.json();
 
-  const [newJob, setNewJob] = useState({
-    title: '',
-    applicants: 0,
-    status: 'Active',
-    experience: 'Fresher',
-    skill: 'React JS'
-  });
+        setCompanies(companyData);
 
-  const [profile, setProfile] = useState({
-    company: 'Mk Solutions',
-    email: 'hr@mksolutions.com',
-    location: 'Trivandrum'
-  });
+        const myCompanyIds = companyData
+          .filter((c) => Number(c.userId) === Number(user?.userId))
+          .map((c) => Number(c.companyId));
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    navigate('/');
+        const employerJobs = jobsData.filter((job) =>
+          myCompanyIds.includes(Number(job.companyId))
+        );
+
+        setJobs(employerJobs);
+      } catch (err) {
+        console.log("Job fetch error:", err);
+      } finally {
+        setLoadingJobs(false);
+      }
+    };
+
+    if (user?.userId) fetchData();
+  }, [user?.userId]);
+
+  // ========================
+  // FETCH APPLICATIONS
+  // ========================
+  const fetchApplications = async () => {
+    try {
+      setLoadingApps(true);
+
+      const token = localStorage.getItem("token");
+
+      const res = await fetch("http://localhost:5000/api/application", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !Array.isArray(data)) {
+        console.log("Application API error:", data);
+        setApplications([]);
+        return;
+      }
+
+      const jobIds = jobs.map((j) => String(j.jobId));
+
+      const filtered = data.filter((app) =>
+        jobIds.includes(String(app.jobId || app.job?.jobId))
+      );
+
+      setApplications(filtered);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoadingApps(false);
+    }
   };
 
-  const handleCreateJob = () => {
+  useEffect(() => {
+    if (tab === "candidates" && jobs.length > 0) {
+      fetchApplications();
+    }
+  }, [tab, jobs]);
 
-    setJobs([
-      ...jobs,
-      newJob
-    ]);
-
-    setNewJob({
-      title: '',
-      applicants: 0,
-      status: 'Active',
-      experience: 'Fresher',
-      skill: 'React JS'
-    });
-
-    setOpen(false);
+  // ========================
+  // LOGOUT
+  // ========================
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    navigate("/");
   };
 
   return (
-    <Box sx={{ background: '#f5f5f5', minHeight: '100vh' }}>
+    <Box sx={{ background: "#f5f5f5", minHeight: "100vh" }}>
+      <AppBar position="static" sx={{ background: "#7c3aed" }}>
+        <Toolbar sx={{ justifyContent: "space-between" }}>
+          <Typography fontWeight="bold">
+            Hello, {user?.name?.split(" ")[0]} 👔
+          </Typography>
 
-      <AppBar position="static" sx={{ background: '#7c3aed' }}>
-
-        <Toolbar sx={{ justifyContent: 'space-between' }}>
-
-          <Box>
-
-            <Typography fontWeight="bold">
-              Hello, {user?.name?.split(' ')[0]} 👔
-            </Typography>
-
-            <Typography fontSize="12px" color="#ddd8fe">
-              Employer Dashboard
-            </Typography>
-
-          </Box>
-
-          <Box sx={{ display: 'flex', gap: 1 }}>
-
-            {['jobs', 'candidates', 'profile'].map(t => (
-              <Button
-                key={t}
-                color="inherit"
-                onClick={() => setTab(t)}
-                sx={{
-                  textTransform: 'none',
-                  borderBottom:
-                    tab === t ? '2px solid white' : 'none'
-                }}
-              >
-                {t.charAt(0).toUpperCase() + t.slice(1)}
+          <Box sx={{ display: "flex", gap: 1 }}>
+            {["jobs", "candidates", "profile"].map((t) => (
+              <Button key={t} color="inherit" onClick={() => setTab(t)}>
+                {t}
               </Button>
             ))}
 
-            <Button
-              color="inherit"
-              onClick={handleLogout}
-              sx={{ textTransform: 'none' }}
-            >
+            <Button color="inherit" onClick={handleLogout}>
               Logout
             </Button>
-
           </Box>
-
         </Toolbar>
-
       </AppBar>
 
       <Box sx={{ p: 3 }}>
-
         {/* JOBS */}
-        {tab === 'jobs' && (
+        {tab === "jobs" && (
           <>
+            <Typography variant="h5">Posted Jobs</Typography>
 
-            <Button
-              variant="contained"
-              sx={{
-                mb: 2,
-                textTransform: 'none',
-                background: '#7c3aed'
-              }}
-              onClick={() => setOpen(true)}
-            >
-              Post New Job
-            </Button>
-
-            <Card sx={{ borderRadius: 3 }}>
-
-              {jobs.map((job, i) => (
-                <Box
-                  key={i}
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    p: 2,
-                    borderBottom:
-                      i < jobs.length - 1
-                        ? '1px solid #f0f0f0'
-                        : 'none'
-                  }}
-                >
-
-                  <Box>
-
-                    <Typography fontWeight="bold">
-                      {job.title}
-                    </Typography>
-
-                    <Typography
-                      fontSize="12px"
-                      color="#6b7280"
-                    >
-                      {job.experience} • {job.skill} • {job.applicants} applicants
-                    </Typography>
-
-                  </Box>
-
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-
-                    <Chip
-                      label={job.status}
-                      size="small"
-                      color={
-                        job.status === 'Active'
-                          ? 'success'
-                          : 'default'
-                      }
-                    />
-
-                    <Button
-                      color="error"
-                      size="small"
-                      onClick={() =>
-                        setJobs(
-                          jobs.filter((_, index) => index !== i)
-                        )
-                      }
-                    >
-                      Delete
-                    </Button>
-
-                  </Box>
-
-                </Box>
-              ))}
-
-            </Card>
-
+            {loadingJobs ? (
+              <CircularProgress />
+            ) : jobs.length === 0 ? (
+              <Typography>No jobs found for your company</Typography>
+            ) : (
+              jobs.map((job) => (
+                <Card key={job.jobId} sx={{ p: 2, my: 1 }}>
+                  <Typography fontWeight="bold">{job.title}</Typography>
+                  <Typography>{job.location}</Typography>
+                  <Typography>₹ {job.salary}</Typography>
+                </Card>
+              ))
+            )}
           </>
         )}
 
         {/* CANDIDATES */}
-        {tab === 'candidates' && (
-          <Card sx={{ borderRadius: 3 }}>
+        {tab === "candidates" && (
+          <Card sx={{ p: 3 }}>
+            <Typography fontWeight="bold">
+              Applications for Your Jobs
+            </Typography>
 
-            {candidates.map((c, i) => (
-              <Box
-                key={i}
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  p: 2,
-                  borderBottom:
-                    i < candidates.length - 1
-                      ? '1px solid #f0f0f0'
-                      : 'none'
-                }}
-              >
+            {loadingApps ? (
+              <CircularProgress sx={{ mt: 2 }} />
+            ) : applications.length === 0 ? (
+              <Typography sx={{ mt: 2 }}>No applications yet</Typography>
+            ) : (
+              applications.map((app) => {
+                const job = jobs.find(
+                  (j) => Number(j.jobId) === Number(app.jobId)
+                );
 
-                <Box sx={{ display: 'flex', gap: 2 }}>
-
-                  <Avatar sx={{ background: '#7c3aed' }}>
-                    {c.name.charAt(0)}
-                  </Avatar>
-
-                  <Box>
-
-                    <Typography fontWeight="bold">
-                      {c.name}
+                return (
+                  <Box
+                    key={app.applicationId}
+                    sx={{ p: 2, mt: 2, border: "1px solid #ddd" }}
+                  >
+                    <Typography>
+                      Job: {job?.title || "Unknown Job"}
                     </Typography>
 
-                    <Typography
-                      fontSize="12px"
-                      color="#6b7280"
-                    >
-                      {c.job} • {c.exp}
+                    <Typography>
+                      Candidate: {app.jobSeeker?.user?.name}
                     </Typography>
 
+                    <Typography>
+                      Email: {app.jobSeeker?.user?.email}
+                    </Typography>
+
+                    <Typography>
+                      Status: {app.status}
+                    </Typography>
                   </Box>
-
-                </Box>
-
-                <Chip
-                  label={c.status}
-                  size="small"
-                  color={statusColor[c.status]}
-                />
-
-              </Box>
-            ))}
-
+                );
+              })
+            )}
           </Card>
         )}
 
         {/* PROFILE */}
-        {tab === 'profile' && (
-          <Card sx={{ p: 3, borderRadius: 3 }}>
+        {tab === "profile" && (
+          <Card sx={{ p: 3 }}>
+            <Typography>Company Profile</Typography>
 
-            <Typography
-              fontWeight="bold"
-              fontSize="18px"
-              mb={1}
-            >
-              Company Profile
-            </Typography>
-
-            <Typography color="#6b7280">
-              Company: {profile.company}
-            </Typography>
-
-            <Typography color="#6b7280">
-              Email: {profile.email}
-            </Typography>
-
-            <Typography color="#6b7280">
-              Location: {profile.location}
-            </Typography>
-
+            {companies
+              .filter((c) => Number(c.userId) === Number(user?.userId))
+              .map((c) => (
+                <Box key={c.companyId}>
+                  <Typography>Name: {c.companyName}</Typography>
+                  <Typography>Location: {c.location}</Typography>
+                </Box>
+              ))}
           </Card>
         )}
-
       </Box>
-
-      {/* DIALOG BOX */}
-      <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
-        fullWidth
-      >
-
-        <DialogTitle>
-          Create New Job
-        </DialogTitle>
-
-        <DialogContent
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 2,
-            mt: 1
-          }}
-        >
-
-          <TextField
-            label="Job Title"
-            value={newJob.title}
-            onChange={(e) =>
-              setNewJob({
-                ...newJob,
-                title: e.target.value
-              })
-            }
-          />
-
-          <TextField
-            select
-            label="Experience"
-            value={newJob.experience}
-            onChange={(e) =>
-              setNewJob({
-                ...newJob,
-                experience: e.target.value
-              })
-            }
-          >
-
-            <MenuItem value="Fresher">
-              Fresher
-            </MenuItem>
-
-            <MenuItem value="Experienced">
-              Experienced
-            </MenuItem>
-
-          </TextField>
-
-          <TextField
-            select
-            label="Skills Required"
-            value={newJob.skill}
-            onChange={(e) =>
-              setNewJob({
-                ...newJob,
-                skill: e.target.value
-              })
-            }
-          >
-
-            <MenuItem value="React JS">
-              React JS
-            </MenuItem>
-
-            <MenuItem value="JavaScript">
-              JavaScript
-            </MenuItem>
-
-            <MenuItem value="Python">
-              Python
-            </MenuItem>
-
-            <MenuItem value="UI/UX">
-              UI/UX
-            </MenuItem>
-
-            <MenuItem value="Node JS">
-              Node JS
-            </MenuItem>
-
-          </TextField>
-
-          <TextField
-            type="number"
-            label="Applicants"
-            value={newJob.applicants}
-            onChange={(e) =>
-              setNewJob({
-                ...newJob,
-                applicants: e.target.value
-              })
-            }
-          />
-
-        </DialogContent>
-
-        <DialogActions>
-
-          <Button onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-
-          <Button
-            variant="contained"
-            onClick={handleCreateJob}
-            sx={{ background: '#7c3aed' }}
-          >
-            Create Job
-          </Button>
-
-        </DialogActions>
-
-      </Dialog>
-
     </Box>
   );
 }

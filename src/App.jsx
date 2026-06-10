@@ -11,7 +11,9 @@ import AdminDashboard    from './pages/AdminDashboard';
 function ProtectedRoute({ children, role }) {
   const user = JSON.parse(localStorage.getItem('user'));
   if (!user) return <Navigate to="/login" />;
-  if (role && user.role !== role) return <Navigate to="/login" />;
+  if (role && user.role.toUpperCase() !== role.toUpperCase()) {
+  return <Navigate to="/login" />;
+}
   return children;
 }
 
@@ -23,11 +25,11 @@ function App() {
         <Route path="/login"   element={<Login />} />
         <Route path="/signup"  element={<Signup />} />
         <Route path="/seeker"
-          element={<ProtectedRoute role="seeker"><SeekerDashboard /></ProtectedRoute>} />
+          element={<ProtectedRoute role="JOBSEEKER"><SeekerDashboard /></ProtectedRoute>} />
         <Route path="/employer"
-          element={<ProtectedRoute role="employer"><EmployerDashboard /></ProtectedRoute>} />
+          element={<ProtectedRoute role="EMPLOYER"><EmployerDashboard /></ProtectedRoute>} />
         <Route path="/admin"
-          element={<ProtectedRoute role="admin"><AdminDashboard /></ProtectedRoute>} />
+          element={<ProtectedRoute role="ADMIN"><AdminDashboard /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );
