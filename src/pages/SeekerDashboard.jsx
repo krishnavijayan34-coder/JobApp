@@ -56,7 +56,7 @@ function SeekerDashboard() {
             .filter(Boolean)
         : [];
 
-      setSaved([...new Set(ids)]); // 🔥 remove duplicates
+      setSaved([...new Set(ids)]); 
     } catch (err) {
       console.log(err);
       setSaved([]);
