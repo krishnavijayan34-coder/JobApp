@@ -56,7 +56,7 @@ function SeekerDashboard() {
             .filter(Boolean)
         : [];
 
-      setSaved([...new Set(ids)]); 
+      setSaved([...new Set(ids)]);
     } catch (err) {
       console.log(err);
       setSaved([]);
@@ -67,33 +67,33 @@ function SeekerDashboard() {
     fetchSavedJobs();
   }, []);
 
-  
-  useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const token = localStorage.getItem("token");
+ 
+  const fetchApplications = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-        const res = await fetch(
-          "http://localhost:5000/api/application/my",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        const data = await res.json();
-
-        if (Array.isArray(data)) {
-          setApplications(data);
-          setApplied([...new Set(data.map((a) => Number(a.jobId)))]);
-        } else {
-          setApplications([]);
-          setApplied([]);
+      const res = await fetch(
+        "http://localhost:5000/api/application/my",
+        {
+          headers: { Authorization: `Bearer ${token}` },
         }
-      } catch (err) {
-        console.log(err);
-      }
-    };
+      );
 
+      const data = await res.json();
+
+      if (Array.isArray(data)) {
+        setApplications(data);
+        setApplied([...new Set(data.map((a) => Number(a.jobId)))]);
+      } else {
+        setApplications([]);
+        setApplied([]);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
     fetchApplications();
   }, []);
 
@@ -120,7 +120,7 @@ function SeekerDashboard() {
     fetchProfile();
   }, []);
 
- 
+  
   const handleApply = async (jobId) => {
     try {
       const token = localStorage.getItem("token");
@@ -137,11 +137,9 @@ function SeekerDashboard() {
         }
       );
 
-      const data = await res.json();
-
       if (res.ok) {
-        setApplied((prev) => [...new Set([...prev, Number(jobId)])]);
-        setApplications((prev) => [...prev, data]);
+        
+        await fetchApplications();
       }
     } catch (err) {
       console.log(err);
@@ -153,8 +151,6 @@ function SeekerDashboard() {
     try {
       const token = localStorage.getItem("token");
       await saveJob(jobId, token);
-
-     
       fetchSavedJobs();
     } catch (err) {
       console.log(err);
@@ -201,7 +197,7 @@ function SeekerDashboard() {
       </AppBar>
 
       <Box p={3}>
-        {/* STATS */}
+        
         <Card sx={{ mb: 2 }}>
           <CardContent sx={{ display: "flex", justifyContent: "space-around" }}>
             <Box sx={{ textAlign: "center" }}>
@@ -216,7 +212,7 @@ function SeekerDashboard() {
           </CardContent>
         </Card>
 
-      
+        
         {tab === "jobs" && (
           <>
             <Box display="flex" gap={2} mb={2}>
