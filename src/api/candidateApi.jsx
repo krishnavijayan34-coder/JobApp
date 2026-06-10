@@ -29,7 +29,7 @@ function SeekerDashboard() {
   const [saved, setSaved] = useState([]);
   const [tab, setTab] = useState("jobs");
 
-  // ✅ FETCH JOBS FROM BACKEND
+ 
   useEffect(() => {
     fetch("http://localhost:5000/api/jobs")
       .then((res) => res.json())
@@ -43,7 +43,7 @@ function SeekerDashboard() {
     navigate("/");
   };
 
-  // ✅ FILTER JOBS (backend format)
+
   const filtered = jobs.filter((job) => {
     const matchesFilter =
       filter === "All" || job.jobType === filter;
@@ -124,7 +124,7 @@ function SeekerDashboard() {
           </CardContent>
         </Card>
 
-        {/* JOBS TAB */}
+  
         {tab === "jobs" && (
           <>
             <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
@@ -192,21 +192,21 @@ function SeekerDashboard() {
           </>
         )}
 
-        {/* SAVED */}
+       
         {tab === "saved" && (
           <Typography>
             Saved Jobs: {saved.length}
           </Typography>
         )}
 
-        {/* APPLICATIONS */}
+        
         {tab === "applications" && (
           <Typography>
             Applied Jobs: {appliedJobs.length}
           </Typography>
         )}
 
-        {/* PROFILE */}
+        
         {tab === "profile" && (
           <Card sx={{ p: 3 }}>
             <Box sx={{ display: "flex", gap: 2 }}>

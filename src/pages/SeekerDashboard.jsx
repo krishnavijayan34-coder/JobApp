@@ -29,7 +29,7 @@ function SeekerDashboard() {
   const [profile, setProfile] = useState(null);
   const [tab, setTab] = useState("jobs");
 
-  // ================= JOBS =================
+  
   useEffect(() => {
     fetch("http://localhost:5000/api/jobs")
       .then((res) => res.json())
@@ -37,7 +37,7 @@ function SeekerDashboard() {
       .catch(console.log);
   }, []);
 
-  // ================= SAVED JOBS =================
+  
   const fetchSavedJobs = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -67,7 +67,7 @@ function SeekerDashboard() {
     fetchSavedJobs();
   }, []);
 
-  // ================= APPLICATIONS =================
+  
   useEffect(() => {
     const fetchApplications = async () => {
       try {
@@ -97,7 +97,7 @@ function SeekerDashboard() {
     fetchApplications();
   }, []);
 
-  // ================= PROFILE =================
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -120,7 +120,7 @@ function SeekerDashboard() {
     fetchProfile();
   }, []);
 
-  // ================= APPLY =================
+ 
   const handleApply = async (jobId) => {
     try {
       const token = localStorage.getItem("token");
@@ -148,20 +148,20 @@ function SeekerDashboard() {
     }
   };
 
-  // ================= SAVE JOB =================
+  
   const handleSave = async (jobId) => {
     try {
       const token = localStorage.getItem("token");
       await saveJob(jobId, token);
 
-      // 🔥 re-fetch instead of manual push
+     
       fetchSavedJobs();
     } catch (err) {
       console.log(err);
     }
   };
 
-  // ================= FILTER =================
+  
   const filtered = jobs.filter(
     (j) =>
       (filter === "All" || j.jobType === filter) &&
@@ -216,7 +216,7 @@ function SeekerDashboard() {
           </CardContent>
         </Card>
 
-        {/* JOBS */}
+      
         {tab === "jobs" && (
           <>
             <Box display="flex" gap={2} mb={2}>
@@ -267,7 +267,7 @@ function SeekerDashboard() {
           </>
         )}
 
-        {/* SAVED */}
+        
         {tab === "saved" && (
           <Box>
             <Typography mb={2} fontWeight="bold">
@@ -298,7 +298,7 @@ function SeekerDashboard() {
           </Box>
         )}
 
-        {/* APPLICATIONS */}
+        
         {tab === "applications" && (
           <Box>
             <Typography mb={2} fontWeight="bold">
@@ -334,7 +334,7 @@ function SeekerDashboard() {
           </Box>
         )}
 
-        {/* PROFILE */}
+        
         {tab === "profile" && (
           <Card sx={{ p: 3 }}>
             <Typography fontWeight="bold">

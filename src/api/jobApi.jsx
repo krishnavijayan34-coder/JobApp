@@ -2,9 +2,7 @@ import axios from "axios";
 
 const API_URL = "http://localhost:5000/api/jobs";
 
-/**
- * GET ALL JOBS
- */
+
 export const getAllJobs = async () => {
   try {
     const response = await axios.get(API_URL);
@@ -15,9 +13,7 @@ export const getAllJobs = async () => {
   }
 };
 
-/**
- * GET JOB BY ID
- */
+
 export const getJobById = async (id) => {
   try {
     const response = await axios.get(`${API_URL}/${id}`);
@@ -28,9 +24,6 @@ export const getJobById = async (id) => {
   }
 };
 
-/**
- * CREATE JOB
- */
 export const createJob = async (jobData, token) => {
   try {
     const response = await axios.post(API_URL, jobData, {
@@ -47,9 +40,7 @@ export const createJob = async (jobData, token) => {
   }
 };
 
-/**
- * UPDATE JOB (experience, title, etc.)
- */
+
 export const updateJob = async (id, jobData, token) => {
   try {
     const response = await axios.put(`${API_URL}/${id}`, jobData, {
@@ -65,9 +56,7 @@ export const updateJob = async (id, jobData, token) => {
   }
 };
 
-/**
- * DELETE JOB
- */
+
 export const deleteJob = async (id, token) => {
   try {
     const response = await axios.delete(`${API_URL}/${id}`, {

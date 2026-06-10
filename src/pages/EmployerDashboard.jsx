@@ -21,9 +21,7 @@ function EmployerDashboard() {
   const [loadingApps, setLoadingApps] = useState(false);
   const [tab, setTab] = useState("jobs");
 
-  // ========================
-  // FETCH JOBS + COMPANIES
-  // ========================
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -56,9 +54,7 @@ function EmployerDashboard() {
     if (user?.userId) fetchData();
   }, [user?.userId]);
 
-  // ========================
-  // FETCH APPLICATIONS
-  // ========================
+
   const fetchApplications = async () => {
     try {
       setLoadingApps(true);
@@ -100,9 +96,7 @@ function EmployerDashboard() {
     }
   }, [tab, jobs]);
 
-  // ========================
-  // LOGOUT
-  // ========================
+ 
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
@@ -153,7 +147,7 @@ function EmployerDashboard() {
           </>
         )}
 
-        {/* CANDIDATES */}
+        
         {tab === "candidates" && (
           <Card sx={{ p: 3 }}>
             <Typography fontWeight="bold">
@@ -197,7 +191,7 @@ function EmployerDashboard() {
           </Card>
         )}
 
-        {/* PROFILE */}
+        
         {tab === "profile" && (
           <Card sx={{ p: 3 }}>
             <Typography>Company Profile</Typography>
