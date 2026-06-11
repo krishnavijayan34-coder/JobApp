@@ -17,6 +17,7 @@ const allUsersData = [
   },
 ];
 
+
 const allJobsData = [
   {
     title:'Frontend Developer',

@@ -15,6 +15,7 @@ function ProtectedRoute({ children, role }) {
   return <Navigate to="/login" />;
 }
   return children;
+  
 }
 
 function App() {

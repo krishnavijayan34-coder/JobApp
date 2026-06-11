@@ -33,6 +33,7 @@ function JobCard({
             {title}
           </Typography>
 
+
           <Chip
             label={type}
             size="small"

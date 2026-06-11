@@ -7,6 +7,7 @@ export const getEmployerDashboard = async () => {
   return response.data;
 };
 
+
 export const createEmployerProfile = async (data) => {
   const response = await axios.post(
     `${API_URL}/company`,

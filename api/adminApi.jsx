@@ -16,6 +16,7 @@ export const users = [
   }
 ];
 
+
 // GET ALL USERS
 export const getAllUsers = () => {
   return users;

@@ -57,6 +57,7 @@ export const updateJob = async (id, jobData, token) => {
 };
 
 
+
 export const deleteJob = async (id, token) => {
   try {
     const response = await axios.delete(`${API_URL}/${id}`, {
