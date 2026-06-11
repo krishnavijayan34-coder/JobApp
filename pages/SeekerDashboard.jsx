@@ -234,20 +234,39 @@ function SeekerDashboard() {
             Hello {user?.name?.split(" ")[0] || "User"} 👋
           </Typography>
 
-          <Box>
-            {["jobs", "saved", "applications", "profile"].map((t) => (
-              <Button
-                key={t}
-                onClick={() => setTab(t)}
-                sx={{ color: "white" }}
-              >
-                {t}
-              </Button>
-            ))}
-            <Button onClick={handleLogout} sx={{ color: "white" }}>
-              Logout
-            </Button>
-          </Box>
+        <Box>
+  {["jobs", "saved", "applications", "profile"].map((t) => (
+    <Button
+      key={t}
+      onClick={() => setTab(t)}
+      variant={tab === t ? "contained" : "text"}
+      sx={{
+        color: "white",
+        mx: 0.5,
+        backgroundColor:
+          tab === t ? "rgba(255,255,255,0.25)" : "transparent",
+        border:
+          tab === t ? "1px solid rgba(255,255,255,0.5)" : "none",
+        fontWeight: tab === t ? "bold" : "normal",
+        "&:hover": {
+          backgroundColor: "rgba(255,255,255,0.15)",
+        },
+      }}
+    >
+      {t.toUpperCase()}
+    </Button>
+  ))}
+
+  <Button
+    onClick={handleLogout}
+    sx={{
+      color: "white",
+      ml: 1,
+    }}
+  >
+    LOGOUT
+  </Button>
+</Box>
         </Toolbar>
       </AppBar>
 

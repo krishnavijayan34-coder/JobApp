@@ -193,20 +193,65 @@ function EmployerDashboard() {
           <Typography>Hello {user?.name?.split(" ")[0]} 👔</Typography>
 
           <Box>
-            {["jobs", "candidates", "profile"].map((t) => (
-              <Button key={t} onClick={() => setTab(t)} sx={{ color: "white" }}>
-                {t}
-              </Button>
-            ))}
+  {["jobs", "candidates", "profile"].map((t) => (
+    <Button
+      key={t}
+      onClick={() => {
+        setTab(t);
+        setOpenJobForm(false);
+      }}
+      variant={tab === t ? "contained" : "text"}
+      sx={{
+        color: "white",
+        mx: 0.5,
+        backgroundColor:
+          tab === t ? "rgba(255,255,255,0.25)" : "transparent",
+        border:
+          tab === t ? "1px solid rgba(255,255,255,0.5)" : "none",
+        fontWeight: tab === t ? "bold" : "normal",
+        "&:hover": {
+          backgroundColor: "rgba(255,255,255,0.15)",
+        },
+      }}
+    >
+      {t.toUpperCase()}
+    </Button>
+  ))}
 
-            <Button onClick={() => setOpenJobForm(true)} sx={{ color: "white" }}>
-              + Post Job
-            </Button>
+  <Button
+    onClick={() => {
+      setOpenJobForm(true);
+      setTab("");
+    }}
+    variant={openJobForm ? "contained" : "text"}
+    sx={{
+      color: "white",
+      mx: 0.5,
+      backgroundColor: openJobForm
+        ? "rgba(255,255,255,0.25)"
+        : "transparent",
+      border: openJobForm
+        ? "1px solid rgba(255,255,255,0.5)"
+        : "none",
+      fontWeight: openJobForm ? "bold" : "normal",
+      "&:hover": {
+        backgroundColor: "rgba(255,255,255,0.15)",
+      },
+    }}
+  >
+    + POST JOB
+  </Button>
 
-            <Button onClick={handleLogout} sx={{ color: "white" }}>
-              Logout
-            </Button>
-          </Box>
+  <Button
+    onClick={handleLogout}
+    sx={{
+      color: "white",
+      ml: 1,
+    }}
+  >
+    LOGOUT
+  </Button>
+</Box>
         </Toolbar>
       </AppBar>
 
