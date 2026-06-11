@@ -34,7 +34,7 @@ function SeekerDashboard() {
     experience: "",
   });
 
-  // ================= JOBS =================
+
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -60,7 +60,7 @@ function SeekerDashboard() {
       });
   }, []);
 
-  // ================= SAVED JOBS =================
+  
   const fetchSavedJobs = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -90,7 +90,7 @@ function SeekerDashboard() {
     fetchSavedJobs();
   }, []);
 
-  // ================= APPLICATIONS =================
+ 
   const fetchApplications = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -117,7 +117,7 @@ function SeekerDashboard() {
     fetchApplications();
   }, []);
 
-  // ================= PROFILE =================
+  
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -147,7 +147,7 @@ function SeekerDashboard() {
     fetchProfile();
   }, []);
 
-  // ================= APPLY =================
+  
   const handleApply = async (jobId) => {
     try {
       const token = localStorage.getItem("token");
@@ -170,7 +170,7 @@ function SeekerDashboard() {
     }
   };
 
-  // ================= SAVE =================
+ 
   const handleSave = async (jobId) => {
     try {
       const token = localStorage.getItem("token");
@@ -181,7 +181,7 @@ function SeekerDashboard() {
     }
   };
 
-  // ================= PROFILE SAVE =================
+  
   const handleProfileSave = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -212,7 +212,7 @@ function SeekerDashboard() {
     }
   };
 
-  // ================= FILTER =================
+  
   const filtered = (jobs || []).filter(
     (j) =>
       (filter === "All" || j.jobType === filter) &&
@@ -252,7 +252,7 @@ function SeekerDashboard() {
       </AppBar>
 
       <Box p={3}>
-        {/* ================= JOBS ================= */}
+        
         {tab === "jobs" && (
           <>
             <Box display="flex" gap={2} mb={2}>
@@ -303,7 +303,7 @@ function SeekerDashboard() {
           </>
         )}
 
-        {/* ================= SAVED ================= */}
+        
         {tab === "saved" && (
           <Box>
             <Typography fontWeight="bold" mb={2}>
@@ -337,7 +337,7 @@ function SeekerDashboard() {
           </Box>
         )}
 
-        {/* ================= APPLICATIONS ================= */}
+        
         {tab === "applications" && (
           <Box>
             <Typography fontWeight="bold" mb={2}>
@@ -369,7 +369,7 @@ function SeekerDashboard() {
           </Box>
         )}
 
-        {/* ================= PROFILE (EDIT FEATURE) ================= */}
+        
         {tab === "profile" && (
           <Box sx={{ background: "white", p: 3, borderRadius: 2 }}>
             <Typography fontWeight="bold" mb={2}>
