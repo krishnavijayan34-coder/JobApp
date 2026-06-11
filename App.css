@@ -1,0 +1,157 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* HEADER */
+.header {
+  background: #2563eb;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header h1 {
+  color: white;
+  font-size: 22px;
+}
+.header a {
+  color: white;
+  text-decoration: none;
+  margin-left: 15px;
+  font-size: 15px;
+}
+.header a:hover {
+  text-decoration: underline;
+}
+
+/* HERO */
+.hero {
+  background: #eff6ff;
+  padding: 60px 30px;
+  text-align: center;
+}
+.hero h2 {
+  font-size: 36px;
+  color: #111827;
+  margin-bottom: 15px;
+}
+.hero p {
+  color: #6b7280;
+  font-size: 16px;
+  margin-bottom: 25px;
+}
+.hero button {
+  padding: 12px 30px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* FORM BOX (Login & Signup) */
+.form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #eff6ff;
+}
+.form-box {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  width: 380px;
+}
+.form-box h2 {
+  text-align: center;
+  color: #2563eb;
+  margin-bottom: 20px;
+}
+.form-box label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #374151;
+  font-size: 14px;
+}
+.form-box input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+.form-box button {
+  width: 100%;
+  padding: 12px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 5px;
+}
+.form-box p {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 14px;
+  color: #374151;
+}
+.form-box a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* DASHBOARD */
+.dashboard {
+  padding: 30px;
+  background: #f9fafb;
+  min-height: 100vh;
+}
+.dashboard h2 {
+  font-size: 26px;
+  color: #111827;
+  margin-bottom: 20px;
+}
+.job-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* JOB CARD */
+.job-card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  border: 1px solid #e5e7eb;
+}
+.job-card h3 {
+  color: #111827;
+  margin-bottom: 6px;
+}
+.job-card p {
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.job-card button {
+  margin-top: 12px;
+  padding: 9px 20px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
